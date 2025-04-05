@@ -43,88 +43,88 @@ export default function Home() {
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
- return (
-  <div className="min-h-screen bg-white text-black flex justify-center">
-    <main className="w-full max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Jigeto Dictionary</h1>
+  return (
+    <div className="min-h-screen bg-white text-black flex justify-center">
+      <main className="w-full max-w-3xl px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">Jigeto Dictionary</h1>
 
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
-        <input
-          type="text"
-          placeholder="Търсене по дума или превод..."
-          className="border px-2 py-1 flex-grow min-w-[180px]"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select
-          className="border px-2 py-1"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        <button
-          className="bg-black text-white px-4 py-1 rounded"
-          onClick={() => setHideTranslation(!hideTranslation)}
-        >
-          {hideTranslation ? "Покажи превод" : "Скрий превод"}
-        </button>
-      </div>
-
-      <label className="block mb-4">
-        <input
-          type="checkbox"
-          checked={showOnlyUnlearned}
-          onChange={() => setShowOnlyUnlearned(!showOnlyUnlearned)}
-          className="mr-2"
-        />
-        Показвай само ненаучени думи
-      </label>
-
-      {filteredData.length === 0 ? (
-        <p>Няма намерени думи.</p>
-      ) : (
-        <div className="space-y-6">
-          {filteredData.map((item, index) => (
-            <div
-              key={index}
-              className="border p-4 rounded shadow bg-gray-50"
-            >
-              <div className="flex justify-between items-center mb-1">
-                <h2 className="text-xl font-semibold">{item.Word}</h2>
-                <span className="italic text-sm text-gray-600">{item.Type}</span>
-              </div>
-              <p className="text-gray-500">{item.Pronunciation}</p>
-              {!hideTranslation && item.Translation && (
-                <p className="mt-2">
-                  <strong>Превод:</strong> {item.Translation}
-                </p>
-              )}
-              {item.Example && (
-                <p className="text-sm italic text-gray-700 mt-1">
-                  {item.Example}
-                </p>
-              )}
-              <div className="mt-2">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={item.Learned?.toLowerCase() === "true"}
-                    onChange={() => {}}
-                    className="mr-2"
-                  />
-                  Научена дума
-                </label>
-              </div>
-            </div>
-          ))}
+        <div className="flex flex-wrap gap-2 mb-4 items-center">
+          <input
+            type="text"
+            placeholder="Търсене по дума или превод..."
+            className="border px-2 py-1 flex-grow min-w-[180px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select
+            className="border px-2 py-1"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          <button
+            className="bg-black text-white px-4 py-1 rounded"
+            onClick={() => setHideTranslation(!hideTranslation)}
+          >
+            {hideTranslation ? "Покажи превод" : "Скрий превод"}
+          </button>
         </div>
-      )}
-    </main>
-  </div>
-);
 
+        <label className="block mb-4">
+          <input
+            type="checkbox"
+            checked={showOnlyUnlearned}
+            onChange={() => setShowOnlyUnlearned(!showOnlyUnlearned)}
+            className="mr-2"
+          />
+          Показвай само ненаучени думи
+        </label>
+
+        {filteredData.length === 0 ? (
+          <p>Няма намерени думи.</p>
+        ) : (
+          <div className="space-y-6">
+            {filteredData.map((item, index) => (
+              <div
+                key={index}
+                className="border p-4 rounded shadow bg-gray-50"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <h2 className="text-xl font-semibold">{item.Word}</h2>
+                  <span className="italic text-sm text-gray-600">{item.Type}</span>
+                </div>
+                <p className="text-gray-500">{item.Pronunciation}</p>
+                {!hideTranslation && item.Translation && (
+                  <p className="mt-2">
+                    <strong>Превод:</strong> {item.Translation}
+                  </p>
+                )}
+                {item.Example && (
+                  <p className="text-sm italic text-gray-700 mt-1">
+                    {item.Example}
+                  </p>
+                )}
+                <div className="mt-2">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={item.Learned?.toLowerCase() === "true"}
+                      onChange={() => {}}
+                      className="mr-2"
+                    />
+                    Научена дума
+                  </label>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
