@@ -44,20 +44,20 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-white text-black flex justify-center">
-      <main className="w-full max-w-3xl px-4 py-8">
+    <div className="min-h-screen bg-gray-100 text-black flex items-start justify-center py-10 px-4">
+      <main className="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Jigeto Dictionary</h1>
 
-        <div className="flex flex-wrap gap-2 mb-4 items-center">
+        <div className="flex flex-wrap gap-2 mb-4 items-center justify-center">
           <input
             type="text"
             placeholder="Търсене по дума или превод..."
-            className="border px-2 py-1 flex-grow min-w-[180px]"
+            className="border px-3 py-2 flex-grow min-w-[180px] rounded"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
-            className="border px-2 py-1"
+            className="border px-3 py-2 rounded"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -68,14 +68,14 @@ export default function Home() {
             ))}
           </select>
           <button
-            className="bg-black text-white px-4 py-1 rounded"
+            className="bg-black text-white px-4 py-2 rounded"
             onClick={() => setHideTranslation(!hideTranslation)}
           >
             {hideTranslation ? "Покажи превод" : "Скрий превод"}
           </button>
         </div>
 
-        <label className="block mb-4">
+        <label className="block mb-6 text-center">
           <input
             type="checkbox"
             checked={showOnlyUnlearned}
@@ -86,7 +86,7 @@ export default function Home() {
         </label>
 
         {filteredData.length === 0 ? (
-          <p>Няма намерени думи.</p>
+          <p className="text-center">Няма намерени думи.</p>
         ) : (
           <div className="space-y-6">
             {filteredData.map((item, index) => (
