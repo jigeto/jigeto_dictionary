@@ -44,7 +44,8 @@ export default function Home() {
   });
 
   return (
-    <main className="max-w-3xl mx-auto p-4">
+    <main className="max-w-3xl mx-auto p-6 min-h-screen bg-white shadow-lg rounded-xl">
+
       <h1 className="text-3xl font-bold mb-4 text-center">Jigeto Dictionary</h1>
 
       <div className="flex flex-wrap gap-2 mb-4 items-center justify-center">
