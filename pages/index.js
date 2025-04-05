@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
@@ -28,7 +27,7 @@ export default function Home() {
 
   const categories = [
     "All",
-    ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
+    ...Array.from(new Set(data.map((item) => item.Type?.trim()).filter(Boolean)))
   ];
 
   const filteredData = data.filter((item) => {
@@ -37,34 +36,22 @@ export default function Home() {
       item.Word?.toLowerCase().includes(search) ||
       item.Translation?.toLowerCase().includes(search);
     const matchesCategory =
-      selectedCategory === "All" || item.Type === selectedCategory;
+      selectedCategory === "All" || item.Type?.trim() === selectedCategory;
     const matchesLearned =
       !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
 
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const handleLearnedChange = async (index) => {
-    await fetch("/api/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rowIndex: index })
-    });
-
-    const updated = [...data];
-    updated[index].Learned = "TRUE";
-    setData(updated);
-  };
-
   return (
     <main className="max-w-3xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Jigeto Dictionary</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">Jigeto Dictionary</h1>
 
-      <div className="flex flex-wrap gap-2 mb-4 items-center">
+      <div className="flex flex-wrap gap-2 mb-4 items-center justify-center">
         <input
           type="text"
           placeholder="Търсене по дума или превод..."
-          className="border px-2 py-1 flex-grow"
+          className="border px-2 py-1 w-64"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -87,7 +74,7 @@ export default function Home() {
         </button>
       </div>
 
-      <label className="block mb-4">
+      <label className="block mb-4 text-center">
         <input
           type="checkbox"
           checked={showOnlyUnlearned}
@@ -98,18 +85,17 @@ export default function Home() {
       </label>
 
       {filteredData.length === 0 ? (
-        <p>Няма намерени думи.</p>
+        <p className="text-center">Няма намерени думи.</p>
       ) : (
         <div className="space-y-4">
           {filteredData.map((item, index) => (
             <div
               key={index}
               className="border p-4 rounded shadow bg-white"
-              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}
             >
-              <div className="flex justify-between w-full">
+              <div className="flex justify-between">
                 <h2 className="text-xl font-semibold">{item.Word}</h2>
-                <span className="italic text-sm">{item.Type}</span>
+                <span className="italic text-sm text-gray-600">{item.Type}</span>
               </div>
               <p className="text-gray-500">{item.Pronunciation}</p>
               {!hideTranslation && item.Translation && (
@@ -127,7 +113,7 @@ export default function Home() {
                   <input
                     type="checkbox"
                     checked={item.Learned?.toLowerCase() === "true"}
-                    onChange={() => handleLearnedChange(index)}
+                    onChange={() => {}}
                     className="mr-2"
                   />
                   Научена дума
