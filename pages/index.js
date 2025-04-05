@@ -43,10 +43,16 @@ export default function Home() {
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const handleLearnedChange = (index) => {
+  const handleLearnedChange = async (index) => {
     const updated = [...data];
-    updated[index].Learned = updated[index].Learned?.toLowerCase() === "true" ? "" : "TRUE";
+    updated[index].Learned = "TRUE";
     setData(updated);
+
+    await fetch("/api/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rowIndex: index }),
+    });
   };
 
   return (
