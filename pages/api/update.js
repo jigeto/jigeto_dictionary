@@ -1,13 +1,13 @@
-
 import { google } from "googleapis";
 import path from "path";
 import { promises as fs } from "fs";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
 
   const { rowIndex } = req.body;
-
   const keyFilePath = path.join(process.cwd(), "jigeto-dictionary-d0dab157dd20.json");
   const keyFile = await fs.readFile(keyFilePath, "utf8");
   const credentials = JSON.parse(keyFile);
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const sheets = google.sheets({ version: "v4", auth });
 
   const spreadsheetId = "1OzrWFSttT9MznzIi3LdM6dadExN3ASTHSqoDg8e1-6M";
-  const range = `Dictionary!J${rowIndex + 2}`;
+  const range = `Dictionary!J${rowIndex + 2}`; // Learned колона
 
   await sheets.spreadsheets.values.update({
     spreadsheetId,
