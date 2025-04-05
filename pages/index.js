@@ -1,78 +1,124 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import Papa from "papaparse";
 
 export default function Home() {
   const [data, setData] = useState([]);
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
-  const [showTranslation, setShowTranslation] = useState(true);
-  const [onlyUnlearned, setOnlyUnlearned] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [hideTranslation, setHideTranslation] = useState(false);
+  const [showOnlyUnlearned, setShowOnlyUnlearned] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const sheetId = '1OzrWFSttT9MznzIi3LdM6dadExN3ASTHSqoDg8e1-6M';
-      const sheetName = 'Dictionary';
-      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
-      const res = await fetch(url);
-      const text = await res.text();
-      const json = JSON.parse(text.substr(47).slice(0, -2));
-      const rows = json.table.rows.map(row => row.c.map(cell => cell ? cell.v : ''));
-      const headers = json.table.cols.map(col => col.label);
-      const result = rows.map(row => Object.fromEntries(row.map((val, i) => [headers[i], val])));
-      setData(result);
+      const sheetId = "1OzrWFSttT9MznzIi3LdM6dadExN3ASTHSqoDg8e1-6M";
+      const sheetName = "Dictionary";
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+      const response = await fetch(url);
+      const reader = response.body.getReader();
+      const result = await reader.read();
+      const decoder = new TextDecoder("utf-8");
+      const csv = decoder.decode(result.value);
+      const parsed = Papa.parse(csv, { header: true });
+      setData(parsed.data);
     };
+
     fetchData();
   }, []);
 
-  const filtered = data.filter(entry => {
-    const matchesQuery = entry.Word?.toLowerCase().includes(query.toLowerCase()) || entry.Translation?.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = category === 'All' || entry.Type === category;
-    const matchesLearned = !onlyUnlearned || entry.Learned !== 'TRUE';
-    return matchesQuery && matchesCategory && matchesLearned;
+  const categories = [
+    "All",
+    ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
+  ];
+
+  const filteredData = data.filter((item) => {
+    const search = searchTerm.toLowerCase();
+    const matchesSearch =
+      item.Word?.toLowerCase().includes(search) ||
+      item.Translation?.toLowerCase().includes(search);
+    const matchesCategory =
+      selectedCategory === "All" || item.Type === selectedCategory;
+    const matchesLearned =
+      !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
+
+    return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const categories = [...new Set(data.map(entry => entry.Type).filter(Boolean))];
-
   return (
-    <main className="min-h-screen bg-white text-black p-6 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-6">Jigeto Dictionary</h1>
-      <div className="flex gap-4 mb-4 flex-wrap justify-center">
+    <main className="max-w-3xl mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Jigeto Dictionary</h1>
+
+      <div className="flex flex-wrap gap-2 mb-4 items-center">
         <input
           type="text"
           placeholder="Търсене по дума или превод..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="border px-3 py-2 w-64 rounded"
+          className="border px-2 py-1 flex-grow"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border px-2 py-2 rounded">
-          <option>All</option>
-          {categories.map(cat => <option key={cat}>{cat}</option>)}
+        <select
+          className="border px-2 py-1"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
-        <button onClick={() => setShowTranslation(!showTranslation)} className="bg-black text-white px-4 py-2 rounded">
-          {showTranslation ? 'Скрий превод' : 'Покажи превод'}
+        <button
+          className="bg-black text-white px-4 py-1 rounded"
+          onClick={() => setHideTranslation(!hideTranslation)}
+        >
+          {hideTranslation ? "Покажи превод" : "Скрий превод"}
         </button>
       </div>
-      <label className="mb-4 block">
-        <input type="checkbox" checked={onlyUnlearned} onChange={() => setOnlyUnlearned(!onlyUnlearned)} className="mr-2" />
+
+      <label className="block mb-4">
+        <input
+          type="checkbox"
+          checked={showOnlyUnlearned}
+          onChange={() => setShowOnlyUnlearned(!showOnlyUnlearned)}
+          className="mr-2"
+        />
         Показвай само ненаучени думи
       </label>
-      {filtered.length === 0 ? (
+
+      {filteredData.length === 0 ? (
         <p>Няма намерени думи.</p>
       ) : (
-        filtered.map((entry, i) => (
-          <div key={i} className="border rounded p-4 mb-4 shadow w-full max-w-2xl">
-            <div className="flex justify-between items-start">
-              <h2 className="text-xl font-bold">{entry.Word}</h2>
-              <span className="italic">{entry.Type}</span>
+        <div className="space-y-4">
+          {filteredData.map((item, index) => (
+            <div key={index} className="border p-4 rounded shadow">
+              <div className="flex justify-between">
+                <h2 className="text-xl font-semibold">{item.Word}</h2>
+                <span className="italic text-sm">{item.Type}</span>
+              </div>
+              <p className="text-gray-500">{item.Pronunciation}</p>
+              {!hideTranslation && item.Translation && (
+                <p className="mt-2">
+                  <strong>Превод:</strong> {item.Translation}
+                </p>
+              )}
+              {item.Example && (
+                <p className="text-sm italic text-gray-700 mt-1">
+                  {item.Example}
+                </p>
+              )}
+              <div className="mt-2">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={item.Learned?.toLowerCase() === "true"}
+                    disabled
+                    className="mr-2"
+                  />
+                  Научена дума
+                </label>
+              </div>
             </div>
-            <div className="text-gray-600">{entry.Pronunciation}</div>
-            {showTranslation && <div className="mt-2"><strong>Превод:</strong> {entry.Translation}</div>}
-            {entry.Example && <div className="text-sm italic mt-1">{entry.Example}</div>}
-            <label className="mt-2 block">
-              <input type="checkbox" defaultChecked={entry.Learned === 'TRUE'} className="mr-2" />
-              Научена дума
-            </label>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </main>
   );
