@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+""import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
 export default function Home() {
@@ -47,26 +47,21 @@ export default function Home() {
     const matchesCategory =
       selectedCategory === "All" || item.Type?.trim() === selectedCategory;
     const matchesLearned =
-      !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
+      !showOnlyUnlearned || String(item.Learned).toLowerCase() !== "true";
 
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const handleLearnedChange = async (filteredIndex) => {
-    const word = filteredData[filteredIndex].Word;
-    const realIndex = data.findIndex((item) => item.Word === word);
-
-    if (realIndex === -1) return;
-
+  const handleLearnedChange = async (index) => {
     const updated = [...data];
-    updated[realIndex].Learned = "TRUE";
+    updated[index].Learned = "TRUE";
     setData(updated);
 
     try {
       const response = await fetch("/api/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rowIndex: realIndex }),
+        body: JSON.stringify({ rowIndex: index + 2, column: "J", value: "TRUE" }),
       });
 
       if (!response.ok) {
@@ -82,7 +77,7 @@ export default function Home() {
     <div style={{
       display: "flex",
       justifyContent: "center",
-      alignItems: "flex-start",
+      alignItems: "center",
       minHeight: "100vh",
       backgroundColor: "#f3f4f6",
       padding: "2.5rem 1rem"
@@ -210,7 +205,7 @@ export default function Home() {
                   <label>
                     <input
                       type="checkbox"
-                      checked={item.Learned?.toLowerCase() === "true"}
+                      checked={String(item.Learned).toLowerCase() === "true"}
                       onChange={() => handleLearnedChange(index)}
                       style={{ marginRight: "0.5rem" }}
                     />
