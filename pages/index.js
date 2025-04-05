@@ -19,7 +19,17 @@ export default function Home() {
       const decoder = new TextDecoder("utf-8");
       const csv = decoder.decode(result.value);
       const parsed = Papa.parse(csv, { header: true });
-      setData(parsed.data);
+const cleanedData = parsed.data.map((row) => {
+  const cleanedRow = {};
+  for (let key in row) {
+    const trimmedKey = key.trim();
+    cleanedRow[trimmedKey] = row[key];
+  }
+  return cleanedRow;
+});
+console.log("Данни от таблицата:", cleanedData[0]); // Показва първи ред
+setData(cleanedData);
+
     };
 
     fetchData();
@@ -27,7 +37,7 @@ export default function Home() {
 
   const categories = [
     "All",
-    ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
+    ...Array.from(new Set(data.map((item) => item.Type?.trim()).filter(Boolean)))
   ];
 
   const filteredData = data.filter((item) => {
