@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     
     // Колоната за Learned (предполагам това е колона E или колоната, в която се съхранява тази информация)
     // Можете да промените буквата на колоната, ако е различна във вашата таблица
-    const range = `Dictionary!E${actualRowIndex}`;
+    const range = `Dictionary!J${actualRowIndex}`;
     
     // Изпълняваме актуализацията с TRUE стойност
     await sheets.spreadsheets.values.update({
