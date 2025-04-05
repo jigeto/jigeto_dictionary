@@ -1,41 +1,39 @@
 import { google } from "googleapis";
-import { promises as fs } from "fs";
-import path from "path";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).send("Методът не е позволен");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { rowIndex, column, value } = req.body;
+
+  if (!rowIndex || !column || typeof value === "undefined") {
+    return res.status(400).json({ error: "Missing data" });
   }
 
   try {
-    const { rowIndex, learnedValue } = req.body;
-
-    const keyPath = path.join(process.cwd(), "jigeto-dictionary-d0dab157dd20.json");
-    const keyFile = await fs.readFile(keyPath, "utf-8");
-    const credentials = JSON.parse(keyFile);
-
     const auth = new google.auth.GoogleAuth({
-      credentials,
+      credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
 
     const sheets = google.sheets({ version: "v4", auth });
 
     const spreadsheetId = "1OzrWFSttT9MznzIi3LdM6dadExN3ASTHSqoDg8e1-6M";
-    const range = `Dictionary!J${rowIndex + 2}`; // J = 10-та колона (редовете започват от 2)
+    const range = `Dictionary!${column}${rowIndex}`;
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range,
       valueInputOption: "RAW",
       requestBody: {
-        values: [[learnedValue ? "TRUE" : ""]],
+        values: [[value]],
       },
     });
 
-    res.status(200).json({ message: "Успешно обновено в Google Sheets!" });
+    return res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Грешка при запис в Google Sheets:", error);
-    res.status(500).json({ error: "Неуспешно обновяване в Google Sheets" });
+    console.error("Google Sheets API error:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
