@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -34,17 +33,17 @@ export default function Home() {
   const categories = [...new Set(data.map(entry => entry.Type).filter(Boolean))];
 
   return (
-    <main className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Jigeto Dictionary</h1>
-      <div className="flex gap-2 mb-4 flex-wrap">
+    <main className="min-h-screen bg-white text-black p-6 flex flex-col items-center">
+      <h1 className="text-3xl font-bold mb-6">Jigeto Dictionary</h1>
+      <div className="flex gap-4 mb-4 flex-wrap justify-center">
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Търсене по дума или превод..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="border p-2 rounded flex-grow"
+          className="border px-3 py-2 w-64 rounded"
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border px-2 py-2 rounded">
           <option>All</option>
           {categories.map(cat => <option key={cat}>{cat}</option>)}
         </select>
@@ -54,23 +53,27 @@ export default function Home() {
       </div>
       <label className="mb-4 block">
         <input type="checkbox" checked={onlyUnlearned} onChange={() => setOnlyUnlearned(!onlyUnlearned)} className="mr-2" />
-        Показвай само ненаучени
+        Показвай само ненаучени думи
       </label>
-      {filtered.map((entry, i) => (
-        <div key={i} className="border rounded p-4 mb-4 shadow">
-          <div className="flex justify-between items-start">
-            <h2 className="text-xl font-bold">{entry.Word}</h2>
-            <span className="italic">{entry.Type}</span>
+      {filtered.length === 0 ? (
+        <p>Няма намерени думи.</p>
+      ) : (
+        filtered.map((entry, i) => (
+          <div key={i} className="border rounded p-4 mb-4 shadow w-full max-w-2xl">
+            <div className="flex justify-between items-start">
+              <h2 className="text-xl font-bold">{entry.Word}</h2>
+              <span className="italic">{entry.Type}</span>
+            </div>
+            <div className="text-gray-600">{entry.Pronunciation}</div>
+            {showTranslation && <div className="mt-2"><strong>Превод:</strong> {entry.Translation}</div>}
+            {entry.Example && <div className="text-sm italic mt-1">{entry.Example}</div>}
+            <label className="mt-2 block">
+              <input type="checkbox" defaultChecked={entry.Learned === 'TRUE'} className="mr-2" />
+              Научена дума
+            </label>
           </div>
-          <div className="text-gray-600">{entry.Pronunciation}</div>
-          {showTranslation && <div className="mt-2"><strong>Превод:</strong> {entry.Translation}</div>}
-          {entry.Example && <div className="text-sm italic mt-1">{entry.Example}</div>}
-          <label className="mt-2 block">
-            <input type="checkbox" defaultChecked={entry.Learned === 'TRUE'} className="mr-2" />
-            Научена дума
-          </label>
-        </div>
-      ))}
+        ))
+      )}
     </main>
   );
 }
