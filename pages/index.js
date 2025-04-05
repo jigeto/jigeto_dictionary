@@ -43,6 +43,12 @@ export default function Home() {
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
+  const handleLearnedChange = (index) => {
+    const updated = [...data];
+    updated[index].Learned = updated[index].Learned?.toLowerCase() === "true" ? "" : "TRUE";
+    setData(updated);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 text-black flex items-start justify-center py-10 px-4">
       <main className="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md">
@@ -114,7 +120,7 @@ export default function Home() {
                     <input
                       type="checkbox"
                       checked={item.Learned?.toLowerCase() === "true"}
-                      onChange={() => {}}
+                      onChange={() => handleLearnedChange(index)}
                       className="mr-2"
                     />
                     Научена дума
