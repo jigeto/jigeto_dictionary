@@ -8,9 +8,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { rowIndex } = req.body;
+    const { rowIndex, learnedValue } = req.body;
 
-    // Зареждане на service account ключовете
     const keyPath = path.join(process.cwd(), "jigeto-dictionary-d0dab157dd20.json");
     const keyFile = await fs.readFile(keyPath, "utf-8");
     const credentials = JSON.parse(keyFile);
@@ -23,20 +22,20 @@ export default async function handler(req, res) {
     const sheets = google.sheets({ version: "v4", auth });
 
     const spreadsheetId = "1OzrWFSttT9MznzIi3LdM6dadExN3ASTHSqoDg8e1-6M";
-    const range = `Dictionary!F${rowIndex + 2}`; // Колона "Learned", започвайки от ред 2
+    const range = `Dictionary!J${rowIndex + 2}`; // J = 10-та колона (редовете започват от 2)
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range,
       valueInputOption: "RAW",
       requestBody: {
-        values: [["TRUE"]],
+        values: [[learnedValue ? "TRUE" : ""]],
       },
     });
 
-    res.status(200).json({ message: "Успешно записано!" });
+    res.status(200).json({ message: "Успешно обновено в Google Sheets!" });
   } catch (error) {
     console.error("Грешка при запис в Google Sheets:", error);
-    res.status(500).json({ error: "Грешка при запис в Google Sheets" });
+    res.status(500).json({ error: "Неуспешно обновяване в Google Sheets" });
   }
 }
