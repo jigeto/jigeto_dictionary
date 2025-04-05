@@ -56,20 +56,57 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-black flex flex-col items-center justify-center py-10 px-4">
-      <main className="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">Jigeto Dictionary</h1>
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh",
+      backgroundColor: "#f3f4f6",
+      padding: "2.5rem 1rem"
+    }}>
+      <div style={{
+        width: "100%",
+        maxWidth: "56rem",
+        margin: "0 auto",
+        backgroundColor: "white",
+        padding: "1.5rem",
+        borderRadius: "0.75rem",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+      }}>
+        <h1 style={{
+          fontSize: "1.875rem",
+          fontWeight: "bold",
+          marginBottom: "1.5rem",
+          textAlign: "center"
+        }}>Jigeto Dictionary</h1>
 
-        <div className="flex flex-wrap gap-2 mb-4 items-center justify-center">
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.5rem",
+          marginBottom: "1rem",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
           <input
             type="text"
             placeholder="Търсене по дума или превод..."
-            className="border px-3 py-2 flex-grow min-w-[180px] rounded"
+            style={{
+              border: "1px solid #d1d5db",
+              padding: "0.5rem 0.75rem",
+              flexGrow: 1,
+              minWidth: "180px",
+              borderRadius: "0.25rem"
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
-            className="border px-3 py-2 rounded"
+            style={{
+              border: "1px solid #d1d5db",
+              padding: "0.5rem 0.75rem",
+              borderRadius: "0.25rem"
+            }}
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -80,54 +117,79 @@ export default function Home() {
             ))}
           </select>
           <button
-            className="bg-black text-white px-4 py-2 rounded"
+            style={{
+              backgroundColor: "black",
+              color: "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.25rem"
+            }}
             onClick={() => setHideTranslation(!hideTranslation)}
           >
             {hideTranslation ? "Покажи превод" : "Скрий превод"}
           </button>
         </div>
 
-        <label className="block mb-6 text-center">
+        <label style={{
+          display: "block",
+          marginBottom: "1.5rem",
+          textAlign: "center"
+        }}>
           <input
             type="checkbox"
             checked={showOnlyUnlearned}
             onChange={() => setShowOnlyUnlearned(!showOnlyUnlearned)}
-            className="mr-2"
+            style={{ marginRight: "0.5rem" }}
           />
           Показвай само ненаучени думи
         </label>
 
         {filteredData.length === 0 ? (
-          <p className="text-center">Няма намерени думи.</p>
+          <p style={{ textAlign: "center" }}>Няма намерени думи.</p>
         ) : (
-          <div className="space-y-6">
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             {filteredData.map((item, index) => (
               <div
                 key={index}
-                className="border p-4 rounded shadow bg-gray-50"
+                style={{
+                  border: "1px solid #d1d5db",
+                  padding: "1rem",
+                  borderRadius: "0.25rem",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "#f9fafb"
+                }}
               >
-                <div className="flex justify-between items-center mb-1">
-                  <h2 className="text-xl font-semibold">{item.Word}</h2>
-                  <span className="italic text-sm text-gray-600">{item.Type}</span>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "0.25rem"
+                }}>
+                  <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>{item.Word}</h2>
+                  <span style={{ fontStyle: "italic", fontSize: "0.875rem", color: "#4b5563" }}>{item.Type}</span>
                 </div>
-                <p className="text-gray-500">{item.Pronunciation}</p>
+                <p style={{ color: "#6b7280" }}>{item.Pronunciation}</p>
                 {!hideTranslation && item.Translation && (
-                  <p className="mt-2">
+                  <p style={{ marginTop: "0.5rem" }}>
                     <strong>Превод:</strong> {item.Translation}
                   </p>
                 )}
                 {item.Example && (
-                  <p className="text-sm italic text-gray-700 mt-1">
+                  <p style={{
+                    fontSize: "0.875rem",
+                    fontStyle: "italic",
+                    color: "#4b5563",
+                    marginTop: "0.25rem"
+                  }}>
                     {item.Example}
                   </p>
                 )}
-                <div className="mt-2">
+                <div style={{ marginTop: "0.5rem" }}>
                   <label>
                     <input
                       type="checkbox"
                       checked={item.Learned?.toLowerCase() === "true"}
                       onChange={() => handleLearnedChange(index)}
-                      className="mr-2"
+                      style={{ marginRight: "0.5rem" }}
                     />
                     Научена дума
                   </label>
@@ -136,7 +198,7 @@ export default function Home() {
             ))}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
