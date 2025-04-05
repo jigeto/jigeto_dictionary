@@ -58,9 +58,11 @@ export default function Home() {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Грешка при обновяване:", errorData);
+        // Тук може да добавите показване на грешка на потребителя
       }
     } catch (error) {
       console.error("Грешка при заявката:", error);
+      // Тук може да добавите показване на грешка на потребителя
     }
   };
 
