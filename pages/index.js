@@ -19,17 +19,16 @@ export default function Home() {
       const decoder = new TextDecoder("utf-8");
       const csv = decoder.decode(result.value);
       const parsed = Papa.parse(csv, { header: true });
-const cleanedData = parsed.data.map((row) => {
-  const cleanedRow = {};
-  for (let key in row) {
-    const trimmedKey = key.trim();
-    cleanedRow[trimmedKey] = row[key];
-  }
-  return cleanedRow;
-});
-console.log("Данни от таблицата:", cleanedData[0]); // Показва първи ред
-setData(cleanedData);
 
+      const cleanedData = parsed.data.map((row) => {
+        const cleanedRow = {};
+        for (let key in row) {
+          const trimmedKey = key.trim();
+          cleanedRow[trimmedKey] = row[key];
+        }
+        return cleanedRow;
+      });
+      setData(cleanedData);
     };
 
     fetchData();
@@ -46,7 +45,7 @@ setData(cleanedData);
       item.Word?.toLowerCase().includes(search) ||
       item.Translation?.toLowerCase().includes(search);
     const matchesCategory =
-      selectedCategory === "All" || item.Type === selectedCategory;
+      selectedCategory === "All" || item.Type?.trim() === selectedCategory;
     const matchesLearned =
       !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
 
@@ -61,7 +60,7 @@ setData(cleanedData);
     await fetch("/api/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rowIndex: index }),
+      body: JSON.stringify({ rowIndex: index + 2, column: "J", value: "TRUE" }),
     });
   };
 
