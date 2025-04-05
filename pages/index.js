@@ -19,7 +19,16 @@ export default function Home() {
       const decoder = new TextDecoder("utf-8");
       const csv = decoder.decode(result.value);
       const parsed = Papa.parse(csv, { header: true });
-      setData(parsed.data);
+
+      const cleanedData = parsed.data.map((row) => {
+        const cleanedRow = {};
+        for (let key in row) {
+          const trimmedKey = key.trim();
+          cleanedRow[trimmedKey] = row[key];
+        }
+        return cleanedRow;
+      });
+      setData(cleanedData);
     };
 
     fetchData();
@@ -27,7 +36,7 @@ export default function Home() {
 
   const categories = [
     "All",
-    ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
+    ...Array.from(new Set(data.map((item) => item.Type?.trim()).filter(Boolean)))
   ];
 
   const filteredData = data.filter((item) => {
@@ -36,33 +45,36 @@ export default function Home() {
       item.Word?.toLowerCase().includes(search) ||
       item.Translation?.toLowerCase().includes(search);
     const matchesCategory =
-      selectedCategory === "All" || item.Type === selectedCategory;
+      selectedCategory === "All" || item.Type?.trim() === selectedCategory;
     const matchesLearned =
       !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
 
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const handleLearnedChange = async (index) => {
+  const handleLearnedChange = async (filteredIndex) => {
+    const word = filteredData[filteredIndex].Word;
+    const realIndex = data.findIndex((item) => item.Word === word);
+
+    if (realIndex === -1) return;
+
     const updated = [...data];
-    updated[index].Learned = "TRUE";
+    updated[realIndex].Learned = "TRUE";
     setData(updated);
 
     try {
       const response = await fetch("/api/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rowIndex: index }),
+        body: JSON.stringify({ rowIndex: realIndex }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Грешка при обновяване:", errorData);
-        // Тук може да добавите показване на грешка на потребителя
       }
     } catch (error) {
       console.error("Грешка при заявката:", error);
-      // Тук може да добавите показване на грешка на потребителя
     }
   };
 
