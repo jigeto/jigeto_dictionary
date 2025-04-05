@@ -25,19 +25,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const handleLearnedToggle = async (index) => {
-    const updatedData = [...data];
-    updatedData[index].Learned =
-      updatedData[index].Learned?.toLowerCase() === "true" ? "" : "TRUE";
-    setData(updatedData);
-
-    await fetch("/api/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rowIndex: index, learned: updatedData[index].Learned })
-    });
-  };
-
   const categories = [
     "All",
     ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
@@ -55,6 +42,18 @@ export default function Home() {
 
     return matchesSearch && matchesCategory && matchesLearned;
   });
+
+  const handleLearnedChange = async (index) => {
+    const updated = [...data];
+    updated[index].Learned = "TRUE";
+    setData(updated);
+
+    await fetch("/api/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rowIndex: index }),
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 text-black flex flex-col items-center justify-center py-10 px-4">
@@ -127,7 +126,7 @@ export default function Home() {
                     <input
                       type="checkbox"
                       checked={item.Learned?.toLowerCase() === "true"}
-                      onChange={() => handleLearnedToggle(index)}
+                      onChange={() => handleLearnedChange(index)}
                       className="mr-2"
                     />
                     Научена дума
