@@ -19,16 +19,7 @@ export default function Home() {
       const decoder = new TextDecoder("utf-8");
       const csv = decoder.decode(result.value);
       const parsed = Papa.parse(csv, { header: true });
-
-      const cleanedData = parsed.data.map((row) => {
-        const cleanedRow = {};
-        for (let key in row) {
-          const trimmedKey = key.trim();
-          cleanedRow[trimmedKey] = row[key];
-        }
-        return cleanedRow;
-      });
-      setData(cleanedData);
+      setData(parsed.data);
     };
 
     fetchData();
@@ -36,7 +27,7 @@ export default function Home() {
 
   const categories = [
     "All",
-    ...Array.from(new Set(data.map((item) => item.Type?.trim()).filter(Boolean)))
+    ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
   ];
 
   const filteredData = data.filter((item) => {
@@ -45,7 +36,7 @@ export default function Home() {
       item.Word?.toLowerCase().includes(search) ||
       item.Translation?.toLowerCase().includes(search);
     const matchesCategory =
-      selectedCategory === "All" || item.Type?.trim() === selectedCategory;
+      selectedCategory === "All" || item.Type === selectedCategory;
     const matchesLearned =
       !showOnlyUnlearned || item.Learned?.toLowerCase() !== "true";
 
@@ -57,18 +48,27 @@ export default function Home() {
     updated[index].Learned = "TRUE";
     setData(updated);
 
-    await fetch("/api/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rowIndex: index + 2, column: "J", value: "TRUE" }),
-    });
+    try {
+      const response = await fetch("/api/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rowIndex: index }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Грешка при обновяване:", errorData);
+      }
+    } catch (error) {
+      console.error("Грешка при заявката:", error);
+    }
   };
 
   return (
     <div style={{
       display: "flex",
       justifyContent: "center",
-      alignItems: "center",
+      alignItems: "flex-start",
       minHeight: "100vh",
       backgroundColor: "#f3f4f6",
       padding: "2.5rem 1rem"
