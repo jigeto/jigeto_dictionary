@@ -25,6 +25,19 @@ export default function Home() {
     fetchData();
   }, []);
 
+  const handleLearnedToggle = async (index) => {
+    const updatedData = [...data];
+    updatedData[index].Learned =
+      updatedData[index].Learned?.toLowerCase() === "true" ? "" : "TRUE";
+    setData(updatedData);
+
+    await fetch("/api/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rowIndex: index, learned: updatedData[index].Learned })
+    });
+  };
+
   const categories = [
     "All",
     ...Array.from(new Set(data.map((item) => item.Type).filter(Boolean)))
@@ -43,21 +56,9 @@ export default function Home() {
     return matchesSearch && matchesCategory && matchesLearned;
   });
 
-  const handleLearnedChange = async (index) => {
-    const updated = [...data];
-    updated[index].Learned = "TRUE";
-    setData(updated);
-
-    await fetch("/api/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rowIndex: index }),
-    });
-  };
-
   return (
-    <div className="min-h-screen bg-gray-100 text-black flex items-start justify-center py-10 px-4">
-      <main className="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md">
+    <div className="min-h-screen bg-gray-100 text-black flex flex-col items-center justify-center py-10 px-4">
+      <main className="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">Jigeto Dictionary</h1>
 
         <div className="flex flex-wrap gap-2 mb-4 items-center justify-center">
@@ -126,7 +127,7 @@ export default function Home() {
                     <input
                       type="checkbox"
                       checked={item.Learned?.toLowerCase() === "true"}
-                      onChange={() => handleLearnedChange(index)}
+                      onChange={() => handleLearnedToggle(index)}
                       className="mr-2"
                     />
                     Научена дума
